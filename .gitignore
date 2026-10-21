@@ -178,5 +178,8 @@ temp/
 # Project documentation
 documentation/
 
+# Production backups (database dumps, media, server config). Sensitive, never commit
+/backups/
+
 # Claude Code project instructions (local only)
 CLAUDE.md
