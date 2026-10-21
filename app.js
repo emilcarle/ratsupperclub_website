@@ -9,6 +9,7 @@ configDotenv();
 
 const app = express();
 const port = process.env.APP_PORT;
+const host = process.env.APP_HOST; // e.g. 127.0.0.1 on staging; unset = all interfaces
 
 app.set("view engine", "ejs");
 app.set("layout", false);
@@ -35,6 +36,6 @@ app.use(session({
 
 app.use("/", pageRoutes);
 
-app.listen(port, () => {
-  console.log(`The server is running on ${port}`);
+app.listen(port, host, () => {
+  console.log(`The server is running on ${host ?? "all interfaces"}:${port}`);
 });
