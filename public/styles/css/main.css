@@ -787,53 +787,18 @@ footer li:hover .footer-menu-item {
 .gallery-item.size-f { height: 75%; align-self: center; }
 .gallery-item.size-g { height: 75%; align-self: flex-end; }
 
-/* ===== SELECTED CLIENTS (Module 1, M1.06) ===== */
+/* ===== CLIENTS (Module 1, M1.06) ===== */
 
+/* 48px at the sides, like the "what is RAT?" container (p-5), so the text
+   lines up with the description above it at every screen width. */
 section.clients {
   min-height: auto;
   padding: 48px 48px 72px;
 }
 
-/* Six names in one row on desktop; two rows of three below 768px. */
-.clients-list {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 24px 32px;
-  align-items: center;
-
-  list-style: none;
-  margin: 40px auto 0;
-  padding: 0;
-}
-
-.clients-name {
-  text-align: center;
-  text-transform: uppercase;
-  font-weight: 800;
-  font-size: clamp(14px, 1.45vw, 22px);
-  letter-spacing: 0.04em;
-  line-height: 1.15;
-
-  /* Grey, so the strip reads as a fact rather than as advertising. */
-  color: var(--color-black);
-  opacity: 0.55;
-}
-
 @media (max-width: 767.98px) {
   section.clients {
-    padding: 32px 16px 56px;
-  }
-
-  .clients-list {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px 8px;
-    margin-top: 28px;
-  }
-
-  .clients-name {
-    font-size: 12px;
-    letter-spacing: 0.02em;
-    overflow-wrap: break-word; /* breaks a word only if it can't fit at all */
+    padding: 32px 48px 56px;
   }
 }
 
