@@ -1,6 +1,8 @@
 import express from 'express';
 import { renderMain } from "../controllers/mainController.js";
 import { renderContact } from "../controllers/contactController.js";
+import { renderLegalNotice } from "../controllers/legalNoticeController.js";
+import { submitEnquiry } from "../controllers/enquiryController.js";
 import { renderPrivacy } from "../controllers/privacyController.js";
 import { renderExampleproject } from "../controllers/exampleprojectController.js";
 import { renderProject } from "../controllers/projectController.js";
@@ -34,10 +36,14 @@ router.post("/admin/project-items/:slug/:id", uploadProjectItem, convertImages, 
 router.post("/admin/login", loginAdmin);
 router.post("/admin/landing", requireAuth, uploadLanding, convertImages, updateLanding);
 
+// Before pageView, so a form submission isn't counted as a visit to /contact.
+router.post("/contact", submitEnquiry);
+
 router.use(pageView);
 
 router.get("/", renderMain);
 router.get("/contact", renderContact);
+router.get("/legal-notice", renderLegalNotice);
 router.get("/privacy", renderPrivacy);
 router.get("/exampleproject", renderExampleproject);
 router.get("/projects/:slug", renderProject);

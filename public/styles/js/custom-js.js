@@ -298,6 +298,107 @@ function scrollFix() {
   });
 }
 
+/* Contact form (Module 1, M1.01)
+   Checks the fields with the change request's own messages, then sends the
+   form in the background. On success the thank-you message replaces the form;
+   on failure the error message appears and what was typed stays in place.
+   Without JavaScript the form still works as a normal post (the server then
+   answers with the /contact page). */
+function initContactForm() {
+  const form = document.querySelector("[data-contact-form]");
+  if (!form) return;
+
+  const card = form.closest("[data-contact-card]");
+  const success = card.querySelector("[data-contact-success]");
+  const formError = form.querySelector("[data-form-error]");
+  const button = form.querySelector('button[type="submit"]');
+  const fields = [...form.querySelectorAll("[data-field]")];
+
+  const MESSAGES = {
+    required: "Please complete this field.",
+    email: "Please check the email address.",
+  };
+  const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Our own messages replace the browser's built-in pop-ups.
+  form.noValidate = true;
+
+  function problemWith(input) {
+    if (input.type === "checkbox") return input.checked ? "" : MESSAGES.required;
+    const value = input.value.trim();
+    if (!value) return MESSAGES.required;
+    if (input.type === "email" && !EMAIL_PATTERN.test(value)) return MESSAGES.email;
+    return "";
+  }
+
+  function showFieldError(input, message) {
+    const messageEl = document.getElementById(input.id + "-error");
+    if (messageEl) messageEl.textContent = message || "";
+    if (message) input.setAttribute("aria-invalid", "true");
+    else input.removeAttribute("aria-invalid");
+  }
+
+  // Once a field has been flagged, clear its message as soon as it's fixed.
+  fields.forEach((input) => {
+    const eventName = input.type === "checkbox" ? "change" : "input";
+    input.addEventListener(eventName, () => {
+      if (input.getAttribute("aria-invalid")) showFieldError(input, problemWith(input));
+    });
+  });
+
+  function showFailure() {
+    formError.hidden = false;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    formError.hidden = true;
+
+    let firstInvalid = null;
+    fields.forEach((input) => {
+      const message = problemWith(input);
+      showFieldError(input, message);
+      if (message && !firstInvalid) firstInvalid = input;
+    });
+    if (firstInvalid) {
+      firstInvalid.focus();
+      return;
+    }
+
+    button.disabled = true;
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        headers: { "X-Requested-With": "XMLHttpRequest", Accept: "application/json" },
+        body: new URLSearchParams(new FormData(form)),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok && data.ok) {
+        form.remove();
+        success.hidden = false;
+        success.focus();
+        return;
+      }
+
+      // The server found a problem with a field the browser accepted.
+      const fieldErrors = Object.entries(data.errors || {})
+        .map(([name, message]) => [form.elements[name], message])
+        .filter(([input]) => input);
+      if (fieldErrors.length) {
+        fieldErrors.forEach(([input, message]) => showFieldError(input, message));
+        fieldErrors[0][0].focus();
+      } else {
+        showFailure();
+      }
+    } catch (error) {
+      showFailure();
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
 function initApp() {
   initNavbarCollapse();
   initGalleryDrag();
@@ -310,6 +411,7 @@ function initApp() {
     selector: ".scroll-hint",
   });
   initNewsletterModal();
+  initContactForm();
   initSessionTracking();
   scrollFix();
 }

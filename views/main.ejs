@@ -1,8 +1,12 @@
 <%- include("partials/header.ejs") %>
 <%- include("main/hero.ejs") %>
 <%- include("main/about.ejs") %>
+<%- include("main/clients.ejs") %>
 <div class="background-linear-gradient">
     <%- include("main/services.ejs") %>
     <%- include("main/projects.ejs") %>
 </div>
+<section id="contacts" class="contact-section contact-section--home background-burgundy" data-nav="light">
+    <%- include("partials/contact-form.ejs", { contactForm }) %>
+</section>
 <%- include("partials/footer.ejs") %>

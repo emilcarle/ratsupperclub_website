@@ -14,6 +14,7 @@ export const pageView = async (req, res, next) => {
     const allowedPaths = [
       "/",
       "/contact",
+      "/legal-notice",
       "/privacy"
     ];
 

@@ -1,0 +1,113 @@
+<%#
+  The contact form (RAT Module 1, M1.01). One component, used in two places:
+  the end of the homepage (source "home") and /contact (source "contact").
+  Not in the footer, so it never appears twice on a page.
+
+  Needs: contactForm (from contactFormLocals() in controllers/enquiryController.js)
+  Optional: headingTag ("h1" on /contact, "h2" by default)
+%>
+<%
+  const f = contactForm;
+  const id = (name) => `cf-${f.source}-${name}`;
+  const tag = typeof headingTag !== "undefined" ? headingTag : "h2";
+  const invalid = (name) => f.errors[name] ? 'aria-invalid="true"' : "";
+%>
+<div class="contact-card" data-contact-card>
+  <<%= tag %> class="contact-title archivo">get in touch</<%= tag %>>
+  <p class="contact-intro archivo-narrow burgundy">
+    Tell us what you are planning and we will come back to you within two working days.
+  </p>
+
+  <div class="contact-success archivo-narrow" data-contact-success role="status" tabindex="-1" <%= f.status === "success" ? "" : "hidden" %>>
+    <p class="m-0">
+      Thank you. Your enquiry has reached us and we will reply within two working days.
+      If it is urgent, write directly to <a href="mailto:studio@ratsupperclub.com">studio@ratsupperclub.com</a>.
+    </p>
+  </div>
+
+  <% if (f.status !== "success") { %>
+  <form class="contact-form" action="/contact" method="post" data-contact-form>
+    <input type="hidden" name="source" value="<%= f.source %>">
+    <input type="hidden" name="token" value="<%= f.token %>">
+
+    <!-- Honeypot: hidden from people, bots fill it in. -->
+    <div class="contact-hp" aria-hidden="true">
+      <label for="<%= id('website') %>">Leave this field empty</label>
+      <input type="text" id="<%= id('website') %>" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="contact-field">
+      <label class="contact-label archivo" for="<%= id('name') %>">Full name</label>
+      <input class="contact-input archivo-narrow" type="text" id="<%= id('name') %>" name="name"
+             required maxlength="200" autocomplete="name" data-field
+             aria-describedby="<%= id('name') %>-error" <%- invalid("name") %>
+             value="<%= f.values.name || '' %>">
+      <p class="contact-error archivo-narrow" id="<%= id('name') %>-error"><%= f.errors.name || "" %></p>
+    </div>
+
+    <div class="contact-field">
+      <label class="contact-label archivo" for="<%= id('email') %>">Email</label>
+      <input class="contact-input archivo-narrow" type="email" id="<%= id('email') %>" name="email"
+             required maxlength="254" autocomplete="email" data-field
+             aria-describedby="<%= id('email') %>-error" <%- invalid("email") %>
+             value="<%= f.values.email || '' %>">
+      <p class="contact-error archivo-narrow" id="<%= id('email') %>-error"><%= f.errors.email || "" %></p>
+    </div>
+
+    <div class="contact-field">
+      <label class="contact-label archivo" for="<%= id('organisation') %>">Organisation</label>
+      <input class="contact-input archivo-narrow" type="text" id="<%= id('organisation') %>" name="organisation"
+             required maxlength="200" autocomplete="organization" data-field
+             aria-describedby="<%= id('organisation') %>-help <%= id('organisation') %>-error" <%- invalid("organisation") %>
+             value="<%= f.values.organisation || '' %>">
+      <p class="contact-help archivo-narrow" id="<%= id('organisation') %>-help">
+        Company, institution or gallery. If you are writing as a private client, just write “private”.
+      </p>
+      <p class="contact-error archivo-narrow" id="<%= id('organisation') %>-error"><%= f.errors.organisation || "" %></p>
+    </div>
+
+    <div class="contact-field">
+      <label class="contact-label archivo" for="<%= id('message') %>">Tell us about it</label>
+      <textarea class="contact-input archivo-narrow" id="<%= id('message') %>" name="message" rows="6"
+                required maxlength="5000" data-field
+                aria-describedby="<%= id('message') %>-help <%= id('message') %>-error" <%- invalid("message") %>><%= f.values.message || "" %></textarea>
+      <p class="contact-help archivo-narrow" id="<%= id('message') %>-help">
+        What the occasion is, roughly when, where, and how many people. Anything you already have in mind helps.
+      </p>
+      <p class="contact-error archivo-narrow" id="<%= id('message') %>-error"><%= f.errors.message || "" %></p>
+    </div>
+
+    <div class="contact-field contact-consent">
+      <div class="d-flex align-items-start gap-2">
+        <input class="contact-checkbox" type="checkbox" id="<%= id('consent') %>" name="consent" value="yes"
+               required data-field aria-describedby="<%= id('consent') %>-error" <%- invalid("consent") %>
+               <%= f.values.consent ? "checked" : "" %>>
+        <label class="contact-consent-label archivo-narrow" for="<%= id('consent') %>">
+          I agree that RAT may store and use the information in this form in order to respond to my enquiry.
+          See the <a href="/privacy" target="_blank" rel="noopener">privacy policy</a>.
+        </label>
+      </div>
+      <p class="contact-error archivo-narrow" id="<%= id('consent') %>-error"><%= f.errors.consent || "" %></p>
+    </div>
+
+    <p class="contact-form-error archivo-narrow" data-form-error role="alert"
+       <%= f.status === "error" && Object.keys(f.errors).length === 0 ? "" : "hidden" %>>
+      Something went wrong and your enquiry was not sent. Please try again, or write to us directly at
+      <a href="mailto:studio@ratsupperclub.com">studio@ratsupperclub.com</a>.
+    </p>
+
+    <button class="contact-submit des-montilles" type="submit">send</button>
+  </form>
+  <% } %>
+
+  <div class="contact-aside archivo-narrow">
+    <% if (f.calendlyUrl) { %>
+      <p class="m-0">
+        Prefer to talk?
+        <a href="<%= f.calendlyUrl %>" target="_blank" rel="noopener" data-event="calendly-click">Book 30 minutes with us.</a>
+      </p>
+    <% } %>
+    <p class="m-0">Or write directly: <a href="mailto:studio@ratsupperclub.com">studio@ratsupperclub.com</a></p>
+    <p class="m-0">RAT is based in Berlin and works across Europe.</p>
+  </div>
+</div>
